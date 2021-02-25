@@ -1,26 +1,168 @@
 # Pirple Node Pizza service breakdown.
 
-## API calls
+<!-- prettier-ignore-start -->
+This Node project has three main models: Users, Tokens, and Menu.
+User model example:
+    {   
+        "fullName":"John Smith","email":"user@mail.com","streetAddress":"Bakery street,123. North Pole",
+        "hashedPassword":"fb55a2a23a4fa464f193a21004cd297d998f6d56cf715fee10f7452263296498","tosAgreement":true,
+        "ShoppingCart": ["item1", "item2","item3",...]
+    }
+Token model example:
+    {   
+        "email":"user@mail.com","id":"2cfnfn6zkkdnplqjjlmn",
+        "expires":1614272396643 
+    }
+menu can be found @ .data/menu/
 
-Token in headers for:
-get user, update user, update token, delete token,
+This REST API can handle complete CRUD operations for every user. But reading, updating and deleting can only be performed with token validation.
+
+Reading the menu can be done by anyone, but it cannot be updated via the API as of now.
+
+CRUD operations can be done on tokens as well.
+
+On payment processing:
+
+On receipt mailing:
+
+## API call examples
+
+### USERS
+
+
+path (staging):
+localhost:3000/users
 
 Examples:
 
-_Creating an user_
+*Creating an user*
+
 payload:
-{
-"fullName": "Alec Barba",
-"email": "alecburbu@gmail.com",
-"streetAddress": "Bakery street,123. North Pole",
-"password" : "contraseña",
-"tosAgreement": true
-}
-_Reading user data:_
+    {
+    "fullName": "John Doe",
+    "email": "john@test.com",
+    "streetAddress": "Bakery street,123. North Pole",
+    "password" : "securePassword",
+    "tosAgreement": true
+    }
+returns:
+    status 200
 
-payload
-{
+*Reading user data:*
+header:
+    token : [valid_token]
 
-}
+query:
+    ?email=john@test.com
+returns:
+    {
+    "fullName": "John Doe",
+    "email": "john@test.com",
+    "streetAddress": "Bakery street,123. North Pole",
+    "password" : "securePassword",
+    "tosAgreement": true
+    }
 
-TODO: implement token create, update, delete. Test all, users & tokens req with postman
+*Updating user Data*
+header:
+    token : [valid_token]
+payload: 
+    {
+        "email" : "john@test.com"
+        "fullName" : "John William Doe"
+    }
+*email is required, FullName, password or street addr are optional but there must exist one of them.
+returns:
+    status 200
+
+*deleting user*
+headers:
+    token : [valid_token]
+payload:
+    {
+        "email" :"john@test.com"
+    }
+returns:
+    status 200
+
+### TOKENS
+
+path (staging):
+localhost:3000/tokens
+
+*creating token*
+
+payload:
+    {
+        "email" : "john@test.com",
+        "password" : "securePassword"
+    }
+
+returns:
+    status 200
+    {
+        "email" : "john@test.com",
+        "id": "abcdefghijklmnopqrst",
+        "expires": 1614276985652
+    }
+
+*Reading token*
+query:
+    ?id=abcdefghijklmnopqrst
+returns:
+    status 200
+    {
+    "email": "mail@test.com",
+    "id": "abcdefghijklmnopqrst",
+    "expires": 1234576789123
+    }
+
+
+
+*updating token*
+payload:
+    {
+        "id": "abcdefghijklmnopqrst",
+        "extend":true
+    }
+
+returns:
+    status 200
+
+*deleting token*
+query:
+    ?id="abcdefghijklmnopqrst"
+
+returns:
+    status 200
+### Menu
+
+## Assignment requirements
+
+Details (Scenario):
+
+You are building the API for a pizza-delivery company. Don't worry about a frontend, just build the API. Here's the spec from your project manager:
+
+1. New users can be created, their information can be edited, and they can be deleted. We should store their name, email address, and street address.
+
+2. Users can log in and log out by creating or destroying a token.
+
+3. When a user is logged in, they should be able to GET all the possible menu items (these items can be hardcoded into the system).
+
+4. A logged-in user should be able to fill a shopping cart with menu items
+
+5. A logged-in user should be able to create an order. You should integrate with the Sandbox of Stripe.com to accept their payment. Note: Use the stripe sandbox for your testing. Follow this link and click on the "tokens" tab to see the fake tokens you can use server-side to confirm the integration is working: https://stripe.com/docs/testing#cards
+
+6. When an order is placed, you should email the user a receipt. You should integrate with the sandbox of Mailgun.com for this. Note: Every Mailgun account comes with a sandbox email account domain (whatever@sandbox123.mailgun.org) that you can send from by default. So, there's no need to setup any DNS for your domain for this task https://documentation.mailgun.com/en/latest/faqs.html#how-do-i-pick-a-domain-name-for-my-mailgun-account
+
+Important Note: If you use external libraries (NPM) to integrate with Stripe or Mailgun, you will not pass this assignment. You must write your API calls from scratch. Look up the "Curl" documentation for both APIs so you can figure out how to craft your API calls.
+
+This is an open-ended assignment. You may take any direction you'd like to go with it, as long as your project includes the requirements. It can include anything else you wish as well.
+
+And please: Don't forget to document how a client should interact with the API you create!
+
+Turning it In:
+
+Zip up your code files and attach them here to receive a grade and continue with the course.
+
+<!-- prettier-ignore-end -->
