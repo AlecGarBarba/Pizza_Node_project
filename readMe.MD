@@ -1,168 +1,217 @@
 # Pirple Node Pizza service breakdown.
 
 <!-- prettier-ignore-start -->
-This Node project has three main models: Users, Tokens, and Menu.
-User model example:
+Full backend Node Pizza project! Full backend for users to create accounts and shop their favorite pizza. This backend handles user authentication via tokens, has a menu route to handle the shopping cart and can create payments via stripe API, and mail the receipts via mailgun. Since this is built entirely on node, there is no need to NPM install or NPM init anything, so with node installed, it runs right off the bat.
+
+This REST API can handle complete CRUD operations for every user. But reading, updating and deleting can only be performed with token validation.  
+
+Reading the menu can be done by anyone, but it cannot be updated via the API as of now.   
+
+The user can update its shopping cart through the shop route.  Just needs a valid token, and the id of the menu. This adds the item to the user's shopping cart
+
+The user can delete any item from the shopping cart using the menu route as well. Same requirements as above.
+
+To create an order of its shopping cart, the user must create a post request to the orders route, identifying itself with email and valid token. The system will automatically check the shopping cart, place the order, process the payment, send the receipt and empty the shopping cart.
+
+CRUD operations can be done on tokens as well.  
+
+### On payment processing:  
+    Since It is currently in sandbox mode, no actual card payment process has to be made whatsoever. The API call, I believe, just tests that the amount and currency are alright.
+### On receipt mailing:  
+    Same as payment processing. The call is only on sandbox mode, so it can be possible that the actual receipt could not be received. (Sorry for that, I haven't been able to validate my account). However, the API call does return a status 200. 
+## MODELS
+This Node project has three main models: Users, Tokens, and Menu. 
+
+* User model example:  
     {   
-        "fullName":"John Smith","email":"user@mail.com","streetAddress":"Bakery street,123. North Pole",
-        "hashedPassword":"fb55a2a23a4fa464f193a21004cd297d998f6d56cf715fee10f7452263296498","tosAgreement":true,
+        "fullName":"John Smith",
+        "email":"user@mail.com",
+        "streetAddress":"Bakery street,123. North Pole",
+        "hashedPassword":"fb55a2a23a4fa464f193a21004cd297d998f6d56cf715fee10f7452263296498",
+        "tosAgreement":true,
         "ShoppingCart": ["item1", "item2","item3",...]
-    }
-Token model example:
+    }  
+
+* Token model example:  
     {   
         "email":"user@mail.com","id":"2cfnfn6zkkdnplqjjlmn",
         "expires":1614272396643 
-    }
-menu can be found @ .data/menu/
-
-This REST API can handle complete CRUD operations for every user. But reading, updating and deleting can only be performed with token validation.
-
-Reading the menu can be done by anyone, but it cannot be updated via the API as of now.
-
-CRUD operations can be done on tokens as well.
-
-On payment processing:
-
-On receipt mailing:
+    }  
+* menu can be found @ .data/menu/menu.json 
 
 ## API call examples
 
 ### USERS
 
+path (staging):   localhost:3000/users
 
-path (staging):
-localhost:3000/users
+Examples:  
 
-Examples:
+*Creating an user*  
+* method: POST localhost:3000/users
 
-*Creating an user*
-
-payload:
+* payload:  
     {
     "fullName": "John Doe",
     "email": "john@test.com",
     "streetAddress": "Bakery street,123. North Pole",
     "password" : "securePassword",
     "tosAgreement": true
-    }
-returns:
-    status 200
+    }  
+* returns:  
+    status 200  
 
-*Reading user data:*
-header:
+_*Reading user data:*_  
+* method: get localhost:3000/users
+* header:  
     token : [valid_token]
 
-query:
+* query:  
     ?email=john@test.com
-returns:
+* returns:  
     {
     "fullName": "John Doe",
     "email": "john@test.com",
     "streetAddress": "Bakery street,123. North Pole",
     "password" : "securePassword",
     "tosAgreement": true
-    }
+    }  
 
-*Updating user Data*
-header:
+_*Updating user Data*_  
+* method: PUT localhost:3000/users
+* header:  
     token : [valid_token]
-payload: 
-    {
+* payload:   
+    {  
         "email" : "john@test.com"
         "fullName" : "John William Doe"
-    }
+    }  
 *email is required, FullName, password or street addr are optional but there must exist one of them.
-returns:
-    status 200
 
-*deleting user*
-headers:
+* returns:  
+    status 200  
+
+*deleting user*  
+* method: DELETE localhost:3000/users
+* headers:  
     token : [valid_token]
-payload:
-    {
+* payload:  
+    {  
         "email" :"john@test.com"
-    }
-returns:
-    status 200
+    }  
+* returns:  
+    status 200  
 
 ### TOKENS
 
-path (staging):
+path (staging):  
 localhost:3000/tokens
 
-*creating token*
-
-payload:
-    {
+*creating token*  
+* method: POST localhost:3000/tokens
+* payload:  
+    {  
         "email" : "john@test.com",
         "password" : "securePassword"
-    }
+    }  
 
-returns:
-    status 200
-    {
+* returns:  
+    status 200  
+    {  
         "email" : "john@test.com",
         "id": "abcdefghijklmnopqrst",
         "expires": 1614276985652
-    }
+    }  
 
-*Reading token*
-query:
-    ?id=abcdefghijklmnopqrst
-returns:
-    status 200
-    {
+*Reading token*  
+* method: GET localhost:3000/tokens
+* query:      ?id=abcdefghijklmnopqrst
+* returns:  
+    status 200  
+    {  
     "email": "mail@test.com",
     "id": "abcdefghijklmnopqrst",
     "expires": 1234576789123
-    }
+    }  
 
 
 
-*updating token*
-payload:
-    {
+*updating token*  
+* payload:  
+    {  
         "id": "abcdefghijklmnopqrst",
         "extend":true
-    }
+    }  
 
-returns:
-    status 200
+* returns:  
+    status 200  
 
-*deleting token*
-query:
-    ?id="abcdefghijklmnopqrst"
+*deleting token*  
 
-returns:
-    status 200
+* query:  
+    ?id="abcdefghijklmnopqrst"  
+
+* returns:  
+    status 200  
+
 ### Menu
+path (staging):  
+localhost:3000/menu
 
-## Assignment requirements
+*Read all the menu*
+* method - GET localhost:3000/menu
+* returns: 
+status 200
+{
+    "item1": {"price": 129, "description" : "bla bla" },
+    "item2": {"price": 129, "description" : "bla bla" },
+    ...
+}
 
-Details (Scenario):
+*Update shopping cart*
+*method PUT - localhost:3000/menu
 
-You are building the API for a pizza-delivery company. Don't worry about a frontend, just build the API. Here's the spec from your project manager:
 
-1. New users can be created, their information can be edited, and they can be deleted. We should store their name, email address, and street address.
+*delete item from shopping cart*
 
-2. Users can log in and log out by creating or destroying a token.
+### Shopping cart
+The only valid methods are put to update the shopping cart (just to add 1 item at a time), and delete (same, 1 item at a time based on the key in the menu, referenced as menuID)
+*Update shopping cart*
+* method -put localhost:3000/shop
+* header - token : [valid_token]
+* payload:
+    {
+    "email": "john@test.com",
+    "menuID": "pepperoniPizza"
+    }
+* returns 
+    [
+    "pepperoniPizza"
+    ]
 
-3. When a user is logged in, they should be able to GET all the possible menu items (these items can be hardcoded into the system).
+*Delete item from shopping cart* 
+* method -delete localhost:3000/shop
+* header - token : [valid_token]
+* payload:
+    {
+    "email": "john@test.com",
+    "menuID": "pepperoniPizza"
+    }
+* returns 
+    [
+    ]
+    *if the actual item was inside the shopping cart, though.
 
-4. A logged-in user should be able to fill a shopping cart with menu items
+### Orders
+The only valid option is to create an order with post. This method checks if the shopping cart has items, and sends to stripe API and Mailgun API a post method to process payment and mail the user. The orders are placed in the .data/orders folder before any payment attempt or receipt sending.
 
-5. A logged-in user should be able to create an order. You should integrate with the Sandbox of Stripe.com to accept their payment. Note: Use the stripe sandbox for your testing. Follow this link and click on the "tokens" tab to see the fake tokens you can use server-side to confirm the integration is working: https://stripe.com/docs/testing#cards
-
-6. When an order is placed, you should email the user a receipt. You should integrate with the sandbox of Mailgun.com for this. Note: Every Mailgun account comes with a sandbox email account domain (whatever@sandbox123.mailgun.org) that you can send from by default. So, there's no need to setup any DNS for your domain for this task https://documentation.mailgun.com/en/latest/faqs.html#how-do-i-pick-a-domain-name-for-my-mailgun-account
-
-Important Note: If you use external libraries (NPM) to integrate with Stripe or Mailgun, you will not pass this assignment. You must write your API calls from scratch. Look up the "Curl" documentation for both APIs so you can figure out how to craft your API calls.
-
-This is an open-ended assignment. You may take any direction you'd like to go with it, as long as your project includes the requirements. It can include anything else you wish as well.
-
-And please: Don't forget to document how a client should interact with the API you create!
-
-Turning it In:
-
-Zip up your code files and attach them here to receive a grade and continue with the course.
+*Create a new order*
+* method - post localhost:3000/orders
+* header - token : [valid_token]
+* payload:
+    {
+    "email": "john@test.com"
+    }
+* returns:  status 200
 
 <!-- prettier-ignore-end -->

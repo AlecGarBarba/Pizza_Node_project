@@ -1,0 +1,18 @@
+{
+    "pepperoniPizza":{
+    "price": 9.99,
+    "description": "Delicious peperroni pizza"
+    },
+    "hawaiiPizza":{
+        "price": 10.30,
+        "description": "Delicious hawaiian pizza"
+    },
+    "italianPizza":{
+        "price": 11.50,
+        "description": "Delicious italian pizza"
+    },
+    "dietCoke":{
+        "price": 1.50,
+        "description": "Good soda!"
+    }
+}
